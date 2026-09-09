@@ -1,9 +1,80 @@
 <!DOCTYPE html><html lang="en"><head>
 		<meta charset="UTF-8">
 		<meta content="width=device-width, initial-scale=1, maximum-scale=6, shrink-to-fit=no" name="viewport">
-        
-				<title>Best Dispensary And Cannabis Delivery | Tree of Life Weed Dispensary</title>
-		<meta name="description" content="Explore our extensive menu of high-quality cannabis flowers, edibles, concentrates, and more. Shop now for the best weed dispensary experience!">
+<!-- Added at publish. Outbound NAVIGATION (nav links, the search form) intentionally still goes
+     to the client's real site — but without this, the preview's URL travels as the Referer and
+     lands in the client's own GA4/Clarity as an unexplained traffic source, attributing preview
+     activity to their production analytics. no-referrer stops the leak without changing what the
+     links do. -->
+<meta name="referrer" content="no-referrer">
+<script>
+/* ==========================================================================
+   STATIC-PREVIEW NETWORK GUARD  (added at publish; not part of the source site)
+   --------------------------------------------------------------------------
+   Loaded FIRST, before any other script, so every later caller sees the wrapped
+   transports.
+
+   Why this is global rather than per-file: the first attempt guarded ajax() inside
+   dispenza.js alone. That closed one call site and left at least five others open —
+   ecommerce.plugin.js:71 (cart_state), :344 (ajax_get_products), :494 (add_to_cart),
+   ecommerce.js:30 (remove_from_cart) and locations-picker.js:41 (/locations/select) —
+   because the production URLs are injected as inline config in this file
+   (Defaults.base_url, window.sgcom.config.cart.urls), not by the guarded module. A
+   background fetch to the client's production origin was still firing while the browser
+   stayed on the preview. Guard the TRANSPORT, not each caller.
+
+   Scope: blocks programmatic off-origin requests (fetch / XHR / sendBeacon). It does NOT
+   block user-initiated NAVIGATION — the nav links and the search form still take you to
+   the real site, which is intended and documented in README.md.
+   ========================================================================== */
+(function () {
+    var ORIGIN = location.origin;
+    function isForeign(u) {
+        try { return new URL(u, document.baseURI).origin !== ORIGIN; }
+        catch (e) { return true; }   // fail closed
+    }
+    function note(u) {
+        try { console.warn('[static-preview] blocked off-origin request:', String(u)); } catch (e) {}
+    }
+
+    var _fetch = window.fetch;
+    if (_fetch) {
+        window.fetch = function (input, init) {
+            var u = (input && typeof input === 'object' && 'url' in input) ? input.url : input;
+            if (isForeign(u)) {
+                note(u);
+                return Promise.reject(new TypeError('Static preview: off-origin request blocked'));
+            }
+            return _fetch.apply(this, arguments);
+        };
+    }
+
+    var _open = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function (method, url) {
+        if (isForeign(url)) {
+            note(url);
+            this.__previewBlocked = true;
+            return _open.call(this, method, 'about:blank');
+        }
+        return _open.apply(this, arguments);
+    };
+    var _send = XMLHttpRequest.prototype.send;
+    XMLHttpRequest.prototype.send = function () {
+        if (this.__previewBlocked) return;   // swallow — never dispatch
+        return _send.apply(this, arguments);
+    };
+
+    if (navigator.sendBeacon) {
+        var _beacon = navigator.sendBeacon.bind(navigator);
+        navigator.sendBeacon = function (u, data) {
+            if (isForeign(u)) { note(u); return false; }
+            return _beacon(u, data);
+        };
+    }
+})();
+</script>
+				<title>UNOFFICIAL PREVIEW — Best Dispensary And Cannabis Delivery | Tree of Life Weed Dispensary</title>
+		<meta name="description" content="Unofficial static development copy of a single landing page, published for build review. Not the official Tree of Life site; the real site is https://treeoflifenv.com/.">
 
                 
         

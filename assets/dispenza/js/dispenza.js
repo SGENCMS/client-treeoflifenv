@@ -33,8 +33,13 @@
         // application mints a real 7-day session, so every preview visitor was landing in the
         // client's production access logs and session store on page load. Refuse anything not
         // same-origin, before fetch() is ever reached, so the bundle cannot phone home.
+        // Resolve against document.baseURI, NOT location.href: fetch() resolves relative
+        // URLs against baseURI, and the two diverge whenever a <base> tag is present — so
+        // the original form could compute "same-origin", pass, and then let the browser
+        // dispatch to the production origin anyway. Belt-and-braces only: the authoritative
+        // block is the global transport guard in index.html's first <script>.
         try {
-            if (new URL(BASE, location.href).origin !== location.origin) {
+            if (new URL(BASE, document.baseURI).origin !== location.origin) {
                 return Promise.reject({ ok: false, error: 'Static preview: remote calls disabled', code: 0 });
             }
         } catch (e) {

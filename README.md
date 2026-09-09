@@ -34,8 +34,17 @@ Captured and checked by the pipeline, not by eye.
 | Gate | Result |
 | --- | --- |
 | Stage 4 — pixel diff vs live source, 6 viewports | **PASS 6/6** |
-| Stage 5 — bundle audit, 12 acceptance gates | **12/12 PASS** |
+| Stage 5 — bundle audit, re-run on **this published tree** | **10/12** |
 | Stage 5 — Layer 2 assertions | **1 hard**, 2 soft → overall FAIL |
+| Network — programmatic off-origin requests, page exercised | **0** |
+
+Gate 1 and Gate 11 fail *because of how this repo is published*, not because the capture is
+wrong. Gate 1 wants the pipeline's `project/` subdirectory, which is flattened to the repo
+root so GitHub Pages can serve `/client-treeoflifenv/` directly; Gate 11 tests for a literal
+"License" heading that this rewritten README replaced with "Ownership". An earlier revision
+of this file claimed **12/12** — that figure came from the pre-flatten bundle and was never
+true of what is published here. Re-derived by running `clone-stage-5-audit.mjs` against a
+`git archive` of the published commit.
 
 Per-viewport pixel match against the live site (gate is 0.95):
 
@@ -84,13 +93,19 @@ captured. They are deliberate, and they are the only edits to the source markup.
    that fails, so **neither library executed** — the page looked right but was inert.
    Removing the attributes restores them; verified at runtime (`window.jQuery` 3.7.0,
    `window.bootstrap` 12 components).
-4. **The load-time call to the client's production API is blocked.** `dispenza.js`
-   hydrates the cart drawer on page load against `https://treeoflifenv.com/dispenza/ajax/`.
-   The browser blocks the *response* on CORS, but the request still **left** — the
-   preflight was answered `200` and the application minted a real 7-day session, so every
-   preview visitor was being written into the client's production access logs and session
-   store. A same-origin guard now rejects any non-same-origin call before `fetch()` is
-   reached. See "A correction" below.
+4. **All programmatic calls to the client's production API are blocked**, by a global
+   transport guard in the first `<script>` of `index.html` that wraps `fetch`,
+   `XMLHttpRequest` and `navigator.sendBeacon` and rejects anything off-origin.
+   The first attempt at this fix guarded one function (`ajax()` in `dispenza.js`) and was
+   insufficient — at least five other call sites were still open, including
+   `ecommerce.plugin.js:71`, which fetched `/do_shopping/cart_state` from the client's
+   production server *while the browser stayed on the preview*. The production URLs are
+   injected as inline config in `index.html`, not by the guarded module, so a per-file
+   guard could never have covered them. See "A correction" below.
+7. **`no-referrer` referrer policy.** Outbound navigation (nav links, the search form)
+   still goes to the client's real site by design — but the preview's URL was travelling
+   as the `Referer` and landing in the client's own GA4 and Clarity as an unexplained
+   traffic source. This stops that without changing what the links do.
 5. **Social/unfurl metadata rewritten.** The source `og:`/`twitter:` tags carried the
    client's real title, `og:site_name`, description and hotlinked logo, with `og:url`
    pointing at `treeoflifenv.com`. `noindex` governs search indexers only — it does **not**
@@ -108,13 +123,32 @@ client's page is the canonical original.
 
 ## A correction
 
-An earlier revision of this README stated "the clone does not phone home." **That was
-wrong**, and it is worth stating plainly rather than quietly editing. The cart request
-fails visibly in the browser console, which made it look purely local; it is not. The
-request reached the client's production origin, was answered `200` at the preflight, and
-minted a session cookie — once per page view, before the visitor touched anything. Item 4
-above fixes it. The lesson: a CORS error in the console means the *response* was refused,
-not that the *request* was never sent.
+This README has now been wrong twice about the same thing, and both errors are recorded
+here rather than quietly edited.
+
+**First error.** It stated "the clone does not phone home." The cart request fails visibly
+in the browser console, which made it look purely local. It was not: the request reached
+the client's production origin, was answered `200` at the preflight, and minted a session
+cookie, once per page view. *A CORS error in the console means the response was refused,
+not that the request was never sent.*
+
+**Second error.** After guarding `ajax()` in `dispenza.js`, it claimed the preview made
+"zero off-origin requests". That was verified on an *untouched page load only*. Driving the
+page broke it immediately — `window.sgcom.cart.refresh()` still reached
+`https://treeoflifenv.com/do_shopping/cart_state` via a completely different file, while the
+browser stayed on the preview. The guard also had a real bug: it resolved against
+`location.href` while `fetch()` resolves against `document.baseURI`. *Verifying a network
+claim against a page you never interact with proves almost nothing.*
+
+The current guard is global, sits at the transport layer, and is verified by exercising 73
+controls on the page and asserting zero programmatic off-origin requests — not by loading
+the page and looking at the console.
+
+**Scope, stated precisely:** *programmatic* off-origin requests are blocked. User-initiated
+*navigation* is not — clicking a nav link or submitting the search box still takes you to
+the client's real site, which is the intended behaviour for a preview of a page whose whole
+job is to route visitors there. Those navigations do reach the client's server. The
+`no-referrer` policy (change 7) keeps the preview's URL out of their analytics.
 
 ## Known limits
 
@@ -140,6 +174,16 @@ oversights:
   `frame-ancestors 'self'`; this preview cannot.
 - **The commit metadata is public**, including the committer email and a build-session
   trailer.
+- **The pre-remediation commit is still public.** Remediation here was a forward commit, so
+  the original `0915074` remains fetchable — including the `audit.json` with absolute build
+  paths and the impersonating `og:` tags. For anything treated as a *disclosure*, rewriting
+  `HEAD` is not removal; only a history rewrite and force-push (or deleting and recreating
+  the repo) removes it. That is a destructive operation on a published repo and is left as
+  a deliberate decision.
+- **`<link rel="canonical">` still points at the client's page.** This is the standard
+  duplicate-content mitigation and it benefits the client, but it is also an identity
+  assertion pointing away from this preview. Kept deliberately; flagged because it cuts
+  both ways.
 
 ## Vendored file integrity
 
@@ -175,6 +219,7 @@ involved.
   which would silently 404 jQuery, Bootstrap and every Font Awesome webfont.
 - Asset paths mirror the source URL structure verbatim.
 
-## Ownership
+## License / ownership
 
-Clone of client source content, for preview and development use.
+Clone of client source content, for preview and development use. No license is granted;
+all rights in the captured content remain with the original site owner.
