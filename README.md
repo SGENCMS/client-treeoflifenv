@@ -34,17 +34,21 @@ Captured and checked by the pipeline, not by eye.
 | Gate | Result |
 | --- | --- |
 | Stage 4 — pixel diff vs live source, 6 viewports | **PASS 6/6** |
-| Stage 5 — bundle audit, re-run on **this published tree** | **10/12** |
+| Stage 5 — bundle audit, re-run on **this published tree** | **11/12** |
 | Stage 5 — Layer 2 assertions | **1 hard**, 2 soft → overall FAIL |
 | Network — programmatic off-origin requests, page exercised | **0** |
 
-Gate 1 and Gate 11 fail *because of how this repo is published*, not because the capture is
-wrong. Gate 1 wants the pipeline's `project/` subdirectory, which is flattened to the repo
-root so GitHub Pages can serve `/client-treeoflifenv/` directly; Gate 11 tests for a literal
-"License" heading that this rewritten README replaced with "Ownership". An earlier revision
-of this file claimed **12/12** — that figure came from the pre-flatten bundle and was never
-true of what is published here. Re-derived by running `clone-stage-5-audit.mjs` against a
-`git archive` of the published commit.
+The single remaining gate failure is Gate 1 (folder structure), and it fails *because of how
+this repo is published*, not because the capture is wrong: Gate 1 wants the pipeline's
+`project/` subdirectory, which is flattened to the repo root so GitHub Pages can serve
+`/client-treeoflifenv/` directly. Gate 11 briefly failed too — the rewritten README had
+replaced the "License" heading the gate tests for — and is now restored.
+
+An earlier revision of this file claimed **12/12**. That figure came from the pre-flatten
+bundle and was never true of what is published here. Both figures are re-derived by running
+`clone-stage-5-audit.mjs` against a `git archive` of the published commit, not copied from
+`audit.json` — which still reports the pre-flatten 12/12 and should be read with that in
+mind.
 
 Per-viewport pixel match against the live site (gate is 0.95):
 
