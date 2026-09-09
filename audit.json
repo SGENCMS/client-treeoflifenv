@@ -24,13 +24,13 @@
   "clone_stage": 3,
   "emitted_at": "2026-09-08T23:31:01.364Z",
   "stage_5_audit": {
-    "audited_at": "2026-09-09T09:20:21.066Z",
-    "files_walked": 189,
+    "audited_at": "2026-09-09T10:22:30.363Z",
+    "files_walked": 192,
     "file_counts": {
       "html": 1,
       "css": 1,
       "js": 21,
-      "asset": 163,
+      "asset": 166,
       "doc": 3
     },
     "layer_2_hard_issues": [
@@ -206,6 +206,8 @@
           "navigation_attempts": [],
           "navigation_count": 0,
           "exercise_errors": [],
+          "unaudited_same_origin_realms": [],
+          "realm_script_offorigin_refs": [],
           "deferred_timers_seen": 0,
           "unrendered_html": [],
           "unrendered_count": 0,
