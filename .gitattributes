@@ -1,0 +1,2 @@
+# Byte-fidelity clone: never rewrite line endings on checkout.
+* -text

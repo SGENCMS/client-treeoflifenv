@@ -1,0 +1,193 @@
+{
+  "shape": "sp",
+  "source_url": "https://treeoflifenv.com/",
+  "domain": "treeoflifenv.com",
+  "bundle_root": "C:\\Users\\USER\\clone-site-output\\treeoflifenv.com",
+  "chrome_css_chars": 706212,
+  "css_sources_consolidated": 15,
+  "images_in_pages": 6,
+  "images_full_library": 7,
+  "non_image_assets": 31,
+  "transformations": {
+    "links_removed": 11,
+    "styles_removed": 4,
+    "tracking_scripts_stripped": 8,
+    "base_stripped": 0,
+    "data_screen_label_stripped": 0,
+    "url_attrs_rewritten": 28,
+    "internal_hrefs_rewritten": 0,
+    "root_relative_rewritten": 1,
+    "preload_styles_removed": 2,
+    "noscript_styles_removed": 2,
+    "templates_injected": []
+  },
+  "clone_stage": 3,
+  "emitted_at": "2026-09-08T23:31:01.364Z",
+  "stage_5_audit": {
+    "audited_at": "2026-09-08T23:38:47.353Z",
+    "files_walked": 55,
+    "file_counts": {
+      "html": 3,
+      "css": 1,
+      "js": 24,
+      "asset": 24,
+      "doc": 3
+    },
+    "layer_2_hard_issues": [
+      {
+        "file": "C:\\Users\\USER\\clone-site-output\\treeoflifenv.com\\project\\assets\\defaults\\js\\jquery.min.js",
+        "kind": "js",
+        "rule_name": "framework import",
+        "scope_ref": "§L.1",
+        "soft": false
+      }
+    ],
+    "layer_2_soft_issues": [
+      {
+        "file": "C:\\Users\\USER\\clone-site-output\\treeoflifenv.com\\project\\chrome.css",
+        "kind": "css",
+        "rule_name": "transition: all (source-derived)",
+        "scope_ref": "§C.3",
+        "soft": true
+      },
+      {
+        "file": "C:\\Users\\USER\\clone-site-output\\treeoflifenv.com\\project\\chrome.css",
+        "kind": "css",
+        "rule_name": "hardcoded color outside :root",
+        "scope_ref": "§C.3",
+        "soft": true
+      }
+    ],
+    "acceptance_gates": [
+      {
+        "id": 1,
+        "name": "Folder structure",
+        "passed": true,
+        "detail": {
+          "has_readme": true,
+          "has_audit": true,
+          "has_project": true,
+          "shape": "sp"
+        }
+      },
+      {
+        "id": 2,
+        "name": "HTML head conformance",
+        "passed": true,
+        "detail": {
+          "failed": []
+        }
+      },
+      {
+        "id": 3,
+        "name": "CSS placement",
+        "passed": true,
+        "detail": {
+          "pages": [
+            {
+              "file": "C:\\Users\\USER\\clone-site-output\\treeoflifenv.com\\project\\index.html",
+              "inline_style": false,
+              "local_link": true,
+              "remote_stylesheet": false,
+              "passed": true
+            }
+          ]
+        }
+      },
+      {
+        "id": 4,
+        "name": "Google Fonts @import (or no fonts needed)",
+        "passed": true,
+        "detail": {
+          "has_google_fonts_import": false
+        }
+      },
+      {
+        "id": 5,
+        "name": "Fluid type via clamp()",
+        "passed": true,
+        "detail": {
+          "has_clamp": true
+        }
+      },
+      {
+        "id": 6,
+        "name": "@keyframes present (or none in source)",
+        "passed": true,
+        "detail": {
+          "has_keyframes": true
+        }
+      },
+      {
+        "id": 7,
+        "name": "prefers-reduced-motion override",
+        "passed": true,
+        "detail": {
+          "has_reduced_motion": true
+        }
+      },
+      {
+        "id": 8,
+        "name": "Interactive state rules",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "id": 9,
+        "name": "≥3 distinct responsive breakpoints",
+        "passed": true,
+        "detail": {
+          "breakpoints_found": [
+            30,
+            70,
+            90,
+            100,
+            120,
+            130,
+            150,
+            180,
+            200,
+            220,
+            250,
+            276,
+            280,
+            300,
+            320,
+            350,
+            380,
+            420,
+            480,
+            500
+          ]
+        }
+      },
+      {
+        "id": 10,
+        "name": "Cross-origin URL audit",
+        "passed": true,
+        "detail": {
+          "suspicious_refs": []
+        }
+      },
+      {
+        "id": 11,
+        "name": "README.md follows §M structure",
+        "passed": true,
+        "detail": null
+      },
+      {
+        "id": 12,
+        "name": "No build artifacts",
+        "passed": true,
+        "detail": {
+          "has_package_json": false,
+          "has_node_modules": false,
+          "has_dist": false
+        }
+      }
+    ],
+    "all_gates_pass": true,
+    "no_hard_issues": false,
+    "overall_pass": false
+  }
+}
