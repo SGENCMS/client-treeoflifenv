@@ -2,7 +2,7 @@
   "shape": "sp",
   "source_url": "https://treeoflifenv.com/",
   "domain": "treeoflifenv.com",
-  "bundle_root": "C:\\Users\\USER\\clone-site-output\\treeoflifenv.com",
+  "bundle_root": "client-treeoflifenv",
   "chrome_css_chars": 706212,
   "css_sources_consolidated": 15,
   "images_in_pages": 6,
@@ -35,7 +35,7 @@
     },
     "layer_2_hard_issues": [
       {
-        "file": "C:\\Users\\USER\\clone-site-output\\treeoflifenv.com\\project\\assets\\defaults\\js\\jquery.min.js",
+        "file": "assets/defaults/js/jquery.min.js",
         "kind": "js",
         "rule_name": "framework import",
         "scope_ref": "§L.1",
@@ -44,14 +44,14 @@
     ],
     "layer_2_soft_issues": [
       {
-        "file": "C:\\Users\\USER\\clone-site-output\\treeoflifenv.com\\project\\chrome.css",
+        "file": "chrome.css",
         "kind": "css",
         "rule_name": "transition: all (source-derived)",
         "scope_ref": "§C.3",
         "soft": true
       },
       {
-        "file": "C:\\Users\\USER\\clone-site-output\\treeoflifenv.com\\project\\chrome.css",
+        "file": "chrome.css",
         "kind": "css",
         "rule_name": "hardcoded color outside :root",
         "scope_ref": "§C.3",
@@ -85,7 +85,7 @@
         "detail": {
           "pages": [
             {
-              "file": "C:\\Users\\USER\\clone-site-output\\treeoflifenv.com\\project\\index.html",
+              "file": "index.html",
               "inline_style": false,
               "local_link": true,
               "remote_stylesheet": false,

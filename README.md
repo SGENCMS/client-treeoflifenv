@@ -68,7 +68,7 @@ the audit records the conflict honestly rather than suppressing it.
 
 ## Changes made to the capture
 
-This is a public copy of a client's page, so three things were changed from what was
+This is a public copy of a client's page, so six things were changed from what was
 captured. They are deliberate, and they are the only edits to the source markup.
 
 1. **`noindex, nofollow`.** The source served `index, follow, max-image-preview:large`.
@@ -77,23 +77,85 @@ captured. They are deliberate, and they are the only edits to the source markup.
 2. **Tracking removed.** The source carried a Google Tag Manager `<noscript>` iframe
    pointing at a live tag-manager container; left in place it would have fired the
    client's real analytics on every preview visit. The tag is gone, and the orphaned
-   GTM / Microsoft Clarity payloads (~0.9 MB) were pruned from `_xorigin/`. The clone
-   does not phone home.
+   GTM / Microsoft Clarity payloads (~0.9 MB) were pruned from `_xorigin/`.
 3. **Subresource Integrity stripped from vendored scripts.** jQuery and Bootstrap were
    rewritten to local `_xorigin/` paths but kept their original `integrity=` and
    `crossorigin="anonymous"` attributes. Against a local file those force a CORS request
    that fails, so **neither library executed** — the page looked right but was inert.
    Removing the attributes restores them; verified at runtime (`window.jQuery` 3.7.0,
    `window.bootstrap` 12 components).
+4. **The load-time call to the client's production API is blocked.** `dispenza.js`
+   hydrates the cart drawer on page load against `https://treeoflifenv.com/dispenza/ajax/`.
+   The browser blocks the *response* on CORS, but the request still **left** — the
+   preflight was answered `200` and the application minted a real 7-day session, so every
+   preview visitor was being written into the client's production access logs and session
+   store. A same-origin guard now rejects any non-same-origin call before `fetch()` is
+   reached. See "A correction" below.
+5. **Social/unfurl metadata rewritten.** The source `og:`/`twitter:` tags carried the
+   client's real title, `og:site_name`, description and hotlinked logo, with `og:url`
+   pointing at `treeoflifenv.com`. `noindex` governs search indexers only — it does **not**
+   stop link-preview crawlers, so pasting this URL into Slack, Teams, Facebook, X, LinkedIn
+   or iMessage rendered a card indistinguishable from a share of the official dispensary.
+   The tags now identify the page as an unofficial preview and point at this preview's own
+   URL. The two `schema.org` JSON-LD blocks (`Organization`, `WebSite`), which asserted the
+   client's business identity, were removed for the same reason. None of this is rendered,
+   so the pixel match is unaffected.
+6. **`audit.json` paths made repo-relative.** It is served publicly and was disclosing the
+   build machine's absolute Windows paths.
 
-`<link rel="canonical">` and `og:url` already pointed at `https://treeoflifenv.com/` in
-the source and were left unchanged.
+`<link rel="canonical">` still points at `https://treeoflifenv.com/` — correct, since the
+client's page is the canonical original.
+
+## A correction
+
+An earlier revision of this README stated "the clone does not phone home." **That was
+wrong**, and it is worth stating plainly rather than quietly editing. The cart request
+fails visibly in the browser console, which made it look purely local; it is not. The
+request reached the client's production origin, was answered `200` at the preflight, and
+minted a session cookie — once per page view, before the visitor touched anything. Item 4
+above fixes it. The lesson: a CORS error in the console means the *response* was refused,
+not that the *request* was never sent.
 
 ## Known limits
 
-**The cart drawer cannot load.** It fetches `/dispenza/ajax/cart_html` from a live backend
-that does not exist here, and cross-origin the request is refused. This is the only
-runtime error the page produces. No static bundle can satisfy it.
+**The cart drawer stays empty.** It hydrates from `/dispenza/ajax/cart_html` on a backend
+that does not exist here. The request is now refused locally by the same-origin guard
+(change 4), so the drawer renders as an inert empty shell and nothing leaves the browser.
+No static bundle can satisfy it.
+
+## Residual risks not addressed here
+
+These need a decision rather than a patch, and are recorded so they are not mistaken for
+oversights:
+
+- **No on-page disclosure.** Nothing *rendered* tells a visitor this is not the official
+  site — the disclosure lives in `<head>` metadata and in this README. A visible banner
+  would fix it but would break the pixel-fidelity that is the point of the artifact. The
+  alternative is hosting previews privately instead of on a public URL.
+- **The public org exposes the client roster.** `SGENCMS` currently hosts seven public
+  `client-*` Pages sites naming other dispensaries. That is an org-level hosting decision,
+  not something this repo can fix.
+- **No framing or CSP headers.** GitHub Pages cannot set response headers, so this
+  pixel-accurate replica can be embedded in an iframe by anyone. The source site sets
+  `frame-ancestors 'self'`; this preview cannot.
+- **The commit metadata is public**, including the committer email and a build-session
+  trailer.
+
+## Vendored file integrity
+
+SRI was removed (change 3), so nothing pins these files any more. Recorded here so any
+later divergence is a one-command `sha256sum -c` away:
+
+```
+e4fd49181388c48ec5040bd3fe66f57c29c8e67fcd8502b3354b96ec7ab47cc7  _xorigin/cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js
+b8da2c25347b69ad3d7b5b8346725c2b0d06e86712de316e9b0578528e9d4f40  _xorigin/cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.0/webfonts/fa-brands-400.woff2
+f4f5cc8867d30647f0ad918c01599fa8aa9657c39eb55f0fc610120986544385  _xorigin/cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.0/webfonts/fa-regular-400.woff2
+47b1a018f969189c59b87e9d23f9304db54dc9bdcecf00b216c23515f86826e4  _xorigin/cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.0/webfonts/fa-solid-900.woff2
+17256d81225ece54f4e0e3b3711997d094257197f6ac3e2e6ece9cfafa9f9e39  _xorigin/cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.0/webfonts/fa-v4compatibility.woff2
+d8f9afbf492e4c139e9d2bcb9ba6ef7c14921eb509fb703bc7a3f911b774eff8  _xorigin/cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js
+```
+
+Verified byte-identical to a fresh fetch from the origin CDNs at publish time.
 
 **The search box leaves the preview.** The header search is a native GET form with
 `action="https://treeoflifenv.com/search"`, so submitting it navigates to the live site's

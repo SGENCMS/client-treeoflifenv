@@ -27,6 +27,19 @@
     }
 
     function ajax(action, data) {
+        // STATIC-PREVIEW GUARD (added at publish; not present in the source site).
+        // BASE points at the client's PRODUCTION origin. In the browser the response is
+        // CORS-blocked, but the request still LEAVES: the preflight is answered 200 and the
+        // application mints a real 7-day session, so every preview visitor was landing in the
+        // client's production access logs and session store on page load. Refuse anything not
+        // same-origin, before fetch() is ever reached, so the bundle cannot phone home.
+        try {
+            if (new URL(BASE, location.href).origin !== location.origin) {
+                return Promise.reject({ ok: false, error: 'Static preview: remote calls disabled', code: 0 });
+            }
+        } catch (e) {
+            return Promise.reject({ ok: false, error: 'Static preview: remote calls disabled', code: 0 });
+        }
         if (Date.now() < lockoutUntil) {
             return Promise.reject({ ok: false, error: 'Rate limited locally', code: 429 });
         }
