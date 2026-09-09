@@ -24,13 +24,13 @@
   "clone_stage": 3,
   "emitted_at": "2026-09-08T23:31:01.364Z",
   "stage_5_audit": {
-    "audited_at": "2026-09-09T06:33:33.933Z",
-    "files_walked": 186,
+    "audited_at": "2026-09-09T09:20:21.066Z",
+    "files_walked": 189,
     "file_counts": {
       "html": 1,
       "css": 1,
       "js": 21,
-      "asset": 160,
+      "asset": 163,
       "doc": 3
     },
     "layer_2_hard_issues": [
@@ -196,7 +196,6 @@
         "id": 13,
         "name": "Runtime off-origin requests",
         "passed": true,
-        "unrendered_html": [],
         "detail": {
           "pages_checked": [
             "index.html @ 1440x900",
@@ -208,6 +207,8 @@
           "navigation_count": 0,
           "exercise_errors": [],
           "deferred_timers_seen": 0,
+          "unrendered_html": [],
+          "unrendered_count": 0,
           "reason": null
         }
       }
