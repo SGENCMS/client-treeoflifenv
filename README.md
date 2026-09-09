@@ -34,8 +34,9 @@ Captured and checked by the pipeline, not by eye.
 | Gate | Result |
 | --- | --- |
 | Stage 4 — pixel diff vs live source, 6 viewports | **PASS 6/6** |
-| Stage 5 — bundle audit, re-run on **this published tree** | **12/13** |
+| Stage 5 — bundle audit, re-run on **this published tree** | **11/13** |
 | Stage 5 — Gate 13, runtime off-origin requests | **PASS — 0 escapes** |
+| Stage 5 — Gate 10, cross-origin subresources | **FAIL — the search form** |
 | Stage 5 — Layer 2 assertions | **1 hard**, 2 soft → overall FAIL |
 
 The single remaining gate failure is Gate 1 (folder structure), and it fails *because of how
@@ -56,13 +57,32 @@ inline config (`Defaults.base_url`, `sgcom.config.cart.urls`) and consumed by a 
 another file. This preview passed all twelve static gates while fetching the client's
 production origin on load.
 
-Gate 13 renders the bundle headless, exercises it, and fails on any programmatic off-origin
-request. Off-origin *navigation* is aborted rather than counted, because a cloned page's nav
-links legitimately point at the real site. Only the Google Fonts hosts are allowlisted, and
-it fails closed if the browser cannot run.
+Gate 13 renders the bundle and fails on any programmatic off-origin request. Only the Google
+Fonts hosts are allowlisted, and it fails closed if the browser cannot run.
+
+Its first version was then red-teamed, and **all 8 evasion techniques beat it** — because it
+*observed* the network for a few seconds and treated silence as a pass, so its PASS described
+the slice it happened to watch rather than the bundle. A `setTimeout(fetch, 10000)` walked
+straight through. Detection is now instrumentation first: an init script wraps `fetch`, XHR,
+`sendBeacon`, `EventSource`, `WebSocket` and the `img`/`script`/`iframe` src setters and
+records the target URL synchronously *at call time*; long timers are clamped so deferred work
+runs inside the audit window; interception is context-wide so popups are covered; every page
+is rendered at two viewports with a scroll and a dispatched hover/focus/keydown/resize surface.
+Seven of the eight techniques are now caught. The eighth — exfiltration through an allowlisted
+Google Fonts host — is a documented limit, along with WebRTC over UDP.
 
 Gate 10 was also repaired: it had been passing a literal `true` and asserting nothing, which
 is how a live tag-manager `<noscript>` iframe shipped past it.
+
+### Why Gate 10 fails on this bundle, deliberately
+
+The one static failure is the header search form, whose `action` points at
+`https://treeoflifenv.com/search`. Submitting it sends the visitor and their query to the
+client's production server, which answers and mints a session — the same class of contact the
+rest of this bundle was cleaned of. It is left intact (see "Known limits") because it is
+user-visible navigation rather than a covert call, but it is no longer *hidden*: the earlier
+gate recorded exactly this reach and silently exempted it. Surfacing it is the gate working,
+not a regression.
 
 Per-viewport pixel match against the live site (gate is 0.95):
 
