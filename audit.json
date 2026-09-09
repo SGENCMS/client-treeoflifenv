@@ -24,13 +24,13 @@
   "clone_stage": 3,
   "emitted_at": "2026-09-08T23:31:01.364Z",
   "stage_5_audit": {
-    "audited_at": "2026-09-08T23:38:47.353Z",
-    "files_walked": 55,
+    "audited_at": "2026-09-09T04:33:29.158Z",
+    "files_walked": 178,
     "file_counts": {
-      "html": 3,
+      "html": 1,
       "css": 1,
-      "js": 24,
-      "asset": 24,
+      "js": 21,
+      "asset": 152,
       "doc": 3
     },
     "layer_2_hard_issues": [
@@ -62,11 +62,11 @@
       {
         "id": 1,
         "name": "Folder structure",
-        "passed": true,
+        "passed": false,
         "detail": {
           "has_readme": true,
           "has_audit": true,
-          "has_project": true,
+          "has_project": false,
           "shape": "sp"
         }
       },
@@ -163,10 +163,11 @@
       },
       {
         "id": 10,
-        "name": "Cross-origin URL audit",
+        "name": "Cross-origin subresource audit",
         "passed": true,
         "detail": {
-          "suspicious_refs": []
+          "count": 0,
+          "refs": []
         }
       },
       {
@@ -184,9 +185,25 @@
           "has_node_modules": false,
           "has_dist": false
         }
+      },
+      {
+        "id": 13,
+        "name": "Runtime off-origin requests",
+        "passed": true,
+        "detail": {
+          "pages_checked": [
+            "index.html"
+          ],
+          "programmatic_escapes": [],
+          "escape_count": 0,
+          "navigation_attempts": [
+            "GET https://treeoflifenv.com/search?s="
+          ],
+          "reason": null
+        }
       }
     ],
-    "all_gates_pass": true,
+    "all_gates_pass": false,
     "no_hard_issues": false,
     "overall_pass": false
   }
