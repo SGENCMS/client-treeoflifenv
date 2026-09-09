@@ -24,13 +24,13 @@
   "clone_stage": 3,
   "emitted_at": "2026-09-08T23:31:01.364Z",
   "stage_5_audit": {
-    "audited_at": "2026-09-09T10:22:30.363Z",
-    "files_walked": 192,
+    "audited_at": "2026-09-09T11:41:14.064Z",
+    "files_walked": 195,
     "file_counts": {
       "html": 1,
       "css": 1,
       "js": 21,
-      "asset": 166,
+      "asset": 169,
       "doc": 3
     },
     "layer_2_hard_issues": [
